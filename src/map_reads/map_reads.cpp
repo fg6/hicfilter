@@ -279,9 +279,6 @@ int read_draftals(char* file){
 	}	 
 	
   }
-	
-
-
 
   cout << " Mapping done, I found: " 
        << readnum << " reads, " 

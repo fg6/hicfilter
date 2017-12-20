@@ -13,6 +13,15 @@ source $project/project.sh
 cd $project
 
 
+if [ $step == "prepals" ]; then
+    err=0
+    if [ ! -f $samfile ]; then echo; echo "Could not find samfile file in" $samfile;  echo "error";err=$(($err+1)); fi    
+    if [ ! $err -eq 0 ]; then echo; echo " ****  Error! Something is wrong! Giving up! **** "; echo; exit; fi
+ 
+    samtools view -f 0x40 -F 4 -F 0x900 $samfile | awk '{print $1, $2, $3, $4, $7, $8}' > $alfile
+
+fi
+
 if [ $step == "align" ]; then
     #######################################################
     ###############   ALIGN PIPELINE    ##################
@@ -20,11 +29,10 @@ if [ $step == "align" ]; then
     err=0
     if [ ! -f $myref ]; then echo; echo "Could not find reference assembly in" $myref;  echo "error"; err=$(($err+1)); fi
     if [ ! -f $mydraft ]; then echo; echo "Could not find draft assembly in" $mydraft;  echo "error"; err=$(($err+1)); fi
-    if [ ! -f $myfastq1 ]; then echo; echo "Could not find hic fastq1 file in" $myfastq1;  echo "error";err=$(($err+1)); fi
-    if [ ! -f $myfastq2 ]; then echo; echo "Could not find hic fastq2 file in" $myfastq2;  echo "error";err=$(($err+1));  fi
+    if [ ! -f $samfile ]; then echo; echo "Could not find hic fastq1 file in" $myfastq1;  echo "error";err=$(($err+1)); fi
     if [ ! $err -eq 0 ]; then echo; echo " ****  Error! Something is wrong! Giving up! **** "; echo; exit; 
     else echo; echo " All input files found! Proceeding with pipeline.."; echo; fi
-
+    
     $myscripts/runalign.sh $project $2>&1 
 fi
 

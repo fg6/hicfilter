@@ -1,5 +1,4 @@
 #### Parameters to set: ####
-aligner=bwa
 debug=1
 
 # lfs jobs parameters:
@@ -12,7 +11,7 @@ myncpus=15
 ########################
 mymain=MYMAIN
 mydraft=MYDRAFT
-alfile=MYSAM
+samfile=MYSAM
 project=MYDESTDIR
 
 
@@ -22,7 +21,8 @@ mybin=$mymain/bin
 
 # Aligner
 mybwa=$mybin/bwa
-wdir=$project/$aligner\_temp
+wdir=$project/wdir
+alfile=$wdir/sam.als
 draftdir=$wdir/draft
 
 hicdir=$wdir/hicmaps

@@ -17,12 +17,12 @@ step=$1
 cd $project
 
 
-if [ $step == "align" ]; then
+#if [ $step == "prepals" ]; then
     #######################################################
     ###############   ALIGN PIPELINE    ##################
     #######################################################
     $myscripts/pipeline.sh $project $step
-fi
+#fi
 
 
 #if [ $whattodo == "report" ]; then

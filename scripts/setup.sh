@@ -21,9 +21,11 @@ mkdir -p $project/history
 sub1="s#MYMAIN#$mymain#g"
 sub2="s#MYDRAFT#$mydraft#g"
 sub3="s#MYSAM#$mysam#g"
-sub5="s#MYDESTDIR#$project#g"
+sub4="s#MYDESTDIR#$project#g"
 
 sed $sub1 $myscripts/settings.sh | sed $sub2 | sed $sub3 | sed $sub4 > $project/project.sh
+
+
 cp $myscripts/launch.sh $project/launch.sh
 
 

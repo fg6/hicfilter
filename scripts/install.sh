@@ -72,7 +72,7 @@ for code in "${srcs[@]}"; do
     cd $mysrcs/$code
   
     if [[ ! -f $code ]] || [[ ! -f $mybin/$code ]] || [[ $mybin/$code -ot $code.cpp ]] \
-	|| [[ $code -ot $code.cpp ]] || [[ $code -ot $mysrcs/myincs/readfastaq.h ]]; then 
+	|| [[ $code -ot $code.cpp ]] || [[ $code -ot $mysrcs/myinc/map.h ]]; then 
 	
 	make all 
 	rm -f $mybin/$code

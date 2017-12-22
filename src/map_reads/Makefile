@@ -4,11 +4,12 @@
 CC=g++
 SOURCES= map_reads.cpp 
 
-INCLUDES = -I../mylibs/gzstream/ 
+INCLUDES = -I../mylibs/gzstream/ -I../myinc 
 LIBS =  
 
 CFLAGS= -c  $(INCLUDES) 
-COMPILE = $(CC)  -std=c++11 $(CFLAGS)
+COMPILE = $(CC) -std=c++1y $(CFLAGS)
+# -std=c++11 $(CFLAGS)
 
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=$(SOURCES:.cpp=)

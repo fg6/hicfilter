@@ -26,7 +26,7 @@ alfile=$wdir/sam.als
 draftdir=$wdir/draft
 
 hicdir=$wdir/hicmaps
-hictoscaff=$hicdir/hic_to_scaff.als
+hictoscaff=$wdir/hic_to_scaff.als
 
 
 

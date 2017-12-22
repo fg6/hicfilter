@@ -10,49 +10,64 @@ project=$1
 step=$2
 
 source $project/project.sh
-cd $project
+mkdir -p $wdir
+cd $wdir
 
 
-if [ $step == "prepals" ]; then
+#if [ $step == "prepals" ]; then
+    
     err=0
     if [ ! -f $samfile ]; then echo; echo "Could not find samfile file in" $samfile;  echo "error";err=$(($err+1)); fi    
     if [ ! $err -eq 0 ]; then echo; echo " ****  Error! Something is wrong! Giving up! **** "; echo; exit; fi
  
-    samtools view -f 0x40 -F 4 -F 0x900 $samfile | awk '{print $1, $2, $3, $4, $7, $8}' > $alfile
+    if [[ ! -s $alfile ]]; then
+	samtools view -f 0x40 -F 4 -F 0x900 $samfile | awk '{print $1, $2, $3, $4, $7, $8}' > $alfile
+    fi
 
-fi
-
-if [ $step == "align" ]; then
-    #######################################################
-    ###############   ALIGN PIPELINE    ##################
-    #######################################################
-    err=0
-    if [ ! -f $myref ]; then echo; echo "Could not find reference assembly in" $myref;  echo "error"; err=$(($err+1)); fi
-    if [ ! -f $mydraft ]; then echo; echo "Could not find draft assembly in" $mydraft;  echo "error"; err=$(($err+1)); fi
-    if [ ! -f $samfile ]; then echo; echo "Could not find hic fastq1 file in" $myfastq1;  echo "error";err=$(($err+1)); fi
-    if [ ! $err -eq 0 ]; then echo; echo " ****  Error! Something is wrong! Giving up! **** "; echo; exit; 
-    else echo; echo " All input files found! Proceeding with pipeline.."; echo; fi
+    if [[ ! -s $alfile ]]; then  echo; echo "Could not create the alignment file!";  echo "error"; err=$(($err+1)); fi    
+    if [ ! $err -eq 0 ]; then echo; echo " ****  Error! Something is wrong! Giving up! **** "; echo; exit; fi
     
-    $myscripts/runalign.sh $project $2>&1 
-fi
+    echo; echo "1. Alignment file is ready!"
 
-
-#if [ $whattodo == "report" ]; then
-    #######################################################
-    ##################  CREATE REPORT  ###################
-    #######################################################
 #fi
 
+#if [ $step == "prepdraft" ]; then
 
-if [ $step == "check" ]; then
-  ###################################################
-  echo; echo " Looking for possible issues... "
-  ###################################################
+    
+    if [ ! -f $mydraft ]; then echo; echo "Could not find draft assembly in" $mydraft;  echo "error"; err=$(($err+1)); fi
+    if [ ! $err -eq 0 ]; then echo; echo " ****  Error! Something is wrong! Giving up! **** "; echo; exit; fi
 
-  #if [[ ! -f $workdir/$thirdal.al ]]; then
-   #   echo; echo " Error: cannot find file with alignments " $workdir/$thirdal.al
-    #  exit
-  #fi
 
-  #$myscripts/runcheck.sh 
-fi
+    already_there="Yes"
+    if [[ ! -s $wdir/myn50.dat ]] || [[ ! -s $wdir/scaffolds_lenghts.txt ]]; then 
+	$mysrcs/n50/n50 $mydraft '>' $wdir/myn50.dat
+	already_there="No"
+    fi
+
+    if [[ ! -s $wdir/myn50.dat ]] || [[ ! -s $wdir/scaffolds_lenghts.txt ]]; then 
+	echo; echo "Could not analyze draft assembly";  echo "error"; err=$(($err+1)); 
+    fi
+    if [ ! $err -eq 0 ]; then echo; echo " ****  Error! Something is wrong! Giving up! **** "; echo; exit; fi
+
+    
+    echo "2. Draft Stats checked and scaffold_lengths printed"
+
+
+#fi
+
+#if [ $step == "map" ]; then
+    already_there="Yes"
+    if [ ! -f $hictoscaff ]; then 
+	already_there="No"
+	$mysrcs/map_reads/map_reads $wdir/scaffolds_lenghts.txt  $alfile
+	echo
+    fi
+    
+#    if [ ! -f  $hictochr  ] || [ ! -f $hictoscaff ]; then 
+#	echo "  Error: Something went wrong during map_reads"
+#	echo "  (Already there?" $already_there")"
+#	exit 
+#   fi
+    
+
+#fi 

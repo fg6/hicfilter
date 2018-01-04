@@ -34,9 +34,9 @@ auto read_als(char* file){
   int err=0;
   while(getline(infile,line)){
         std::stringstream ss(line);
-        string read, scaffold, cigar, mate;
-        int flag, mapq;
-        long int pos, mate_pos, insert;
+        string read, scaffold, mate;
+        int flag;
+        long int pos, mate_pos;
         int same_scaff=0;
 
         ss >> read >> flag >> scaffold >> pos
@@ -89,9 +89,9 @@ auto  read_als_training(char* file, std::map<string, int>  samechr_map ){
   int err=0;
   while(getline(infile,line)){
         std::stringstream ss(line);
-        string read, scaffold, cigar, mate;
-        int flag, mapq;
-        long int pos, mate_pos, insert;
+        string read, scaffold, mate;
+        int flag;
+        long int pos, mate_pos;
         int same_scaff=0;
 
         ss >> read >> flag >> scaffold >> pos
@@ -134,6 +134,35 @@ auto  read_als_training(char* file, std::map<string, int>  samechr_map ){
 
 
   return pairmap_training;
+}
+
+
+auto read_refals(char* file){
+
+  std::map<string, int>  samechr_map;  
+  std::ifstream infile(file);
+  string line;
+
+  while(getline(infile,line)){
+        std::stringstream ss(line);
+       string read, chr, mate;
+        int flag;
+        long int pos, mate_pos;
+        int same_scaff=0;
+
+        ss >> read >> flag >> chr >> pos
+	   >>  mate >> mate_pos;
+     
+
+        if( samechr_map.count(read) ) continue;
+        
+        if ( mate == "=" ){
+          mate = chr;
+          same_scaff=1;
+        }
+	samechr_map[read] = same_scaff;
+  }
+  return samechr_map;
 }
 
 
@@ -207,7 +236,7 @@ int write_data( auto pairmap, auto lenmap, string filename)
 
 
 	// write info to file
-	myals <<  scaffold << " " << mate << " " 
+	myals << scaffold << " " << mate << " " 
 	      << lenmap[scaffold] << " " 
 	      << lenmap[mate]<< " " 
 	      << nlinks ;

@@ -8,7 +8,7 @@ mysrcs=$main_folder/src
 mybin=$main_folder/bin
 
 # srcs to compile:
-srcs=( map_reads ) 
+srcs=( map_reads map_reads_fortraining ) 
 errs=0
 
 mkdir -p $mybin

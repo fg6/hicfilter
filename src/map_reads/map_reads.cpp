@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
  
  
   // Write map and alignment positions
-  string myname = "map_n_reads.txt";
+  string myname = "hic_to_scaff.als";  //map_n_reads.txt";
   write_data(pairmap,lenmap,myname);
 
   return 0;

@@ -12,6 +12,7 @@ myncpus=15
 mymain=MYMAIN
 mydraft=MYDRAFT
 samfile=MYSAM
+samref=MYREFSAM
 project=MYDESTDIR
 
 
@@ -23,10 +24,8 @@ mybin=$mymain/bin
 mybwa=$mybin/bwa
 wdir=$project/wdir
 alfile=$wdir/sam.als
-draftdir=$wdir/draft
+refals=$wdir/ref.als
 
-hicdir=$wdir/hicmaps
 hictoscaff=$wdir/hic_to_scaff.als
-
-
+hictochr=$wdir/hic_to_scaff_fortraining.als
 

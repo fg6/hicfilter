@@ -5,6 +5,7 @@ mymain=$1
 mydraft=$2
 mysam=$3
 project=$4
+myrefsam=$5
 
 if [ $# -lt 4 ]; then
     echo; echo " Something wrong in your setup.sh script!"
@@ -25,16 +26,19 @@ sub4="s#MYDESTDIR#$project#g"
 
 sed $sub1 $myscripts/settings.sh | sed $sub2 | sed $sub3 | sed $sub4 > $project/project.sh
 
+if [ $# -eq 5 ]; then
+    sub5="s#MYREFSAM#$myrefsam#g"
+    sed -i $sub4  $project/project.sh
+fi
 
 cp $myscripts/launch.sh $project/launch.sh
 
 
 # Saving setup information
 setup_time=`date | awk '{print $6$2$3"_"$4}' | sed 's#:#.#g'`
-echo $mymain/launchme.sh setup $2 $3 $4  > $project/history/$setup_time.txt
+echo $mymain/launchme.sh setup $2 $3 $4 $5 > $project/history/$setup_time.txt
 rm -f $project/setupas.txt
 ln -sf $project/history/$setup_time.txt $project/setupas.txt
-
 
 
 chmod +x $project/*.sh

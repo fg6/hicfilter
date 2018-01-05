@@ -23,6 +23,8 @@ fi
 
 step=$1
 model=$2
+optimize=$3
+if [[ $optimize == "" ]]; then optimize=0; fi
 cd $project
 
 
@@ -30,7 +32,7 @@ cd $project
 #######################################################
 ###############  PIPELINE    ##################
 #######################################################
-$myscripts/pipeline.sh $project $step $model
+$myscripts/pipeline.sh $project $step $model $optimize
 
 
 

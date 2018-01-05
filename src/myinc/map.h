@@ -45,7 +45,6 @@ auto read_als(char* file){
 	
         if ( mate == "=" ) continue;  // pair on same scaffold: not interesting
 	
-	// check for bug: //
 	if(pairmap[scaffold].count(mate) && pairmap[mate].count(scaffold) ){
 	  if(!err)cout << " Error: duplicate in map " << scaffold << " " << mate << endl;
 	  err++;
@@ -79,7 +78,7 @@ auto read_als(char* file){
 
 //std::map< std::string, std::map< std::string, 
 //       std::tuple<vector<long int>,vector<long int>,vector<int> > > > 
-auto  read_als_training(char* file, std::map<string, int>  samechr_map ){
+auto  read_als_training(char* file, std::map<string, int> samechr_map ){
 
   std::map< std::string, 
     std::map< std::string, std::tuple<vector<long int>,vector<long int>,vector<int> > > > pairmap_training;
@@ -87,6 +86,9 @@ auto  read_als_training(char* file, std::map<string, int>  samechr_map ){
   string line;
 
   int err=0;
+  //int ii=0;
+  //int elim=0;
+  //int fine=0;
   while(getline(infile,line)){
         std::stringstream ss(line);
         string read, scaffold, mate;
@@ -98,6 +100,14 @@ auto  read_als_training(char* file, std::map<string, int>  samechr_map ){
 	   >>  mate >> mate_pos;
 
 	
+	/*if(samechr_map[read]){
+	  ii++;
+	  //if(ii<10) cout << " total: " << ii << endl;
+
+	  //if(mate == "=") elim++;
+	  //else fine++;
+	  }*/
+	    
         if ( mate == "=" ) continue;  // pair on same scaffold: not interesting
 	
 	// check for bug: //
@@ -113,6 +123,7 @@ auto  read_als_training(char* file, std::map<string, int>  samechr_map ){
 
           pos1.push_back(pos);
           pos2.push_back(mate_pos);
+	  samechr.push_back(samechr_map[read]);
 	  pairmap_training[scaffold][mate] = std::make_tuple(pos1,pos2,samechr);
 
 	} else if(pairmap_training[mate].count(scaffold) ){ // otherwise, pair [mate][scaffold]  exists already, add one
@@ -122,7 +133,9 @@ auto  read_als_training(char* file, std::map<string, int>  samechr_map ){
 
 	  pos1.push_back(mate_pos);
           pos2.push_back(pos);
+	  samechr.push_back(samechr_map[read]);
 	  pairmap_training[mate][scaffold] = std::make_tuple(pos1,pos2,samechr);
+
 	}else{ // new pair
           vector<long int> pos1 = {pos};
           vector<long int> pos2 = {mate_pos};
@@ -133,6 +146,7 @@ auto  read_als_training(char* file, std::map<string, int>  samechr_map ){
   }
 
 
+  //cout << " Total: " << ii << " eliminated: " << elim << " fine: "<< fine << endl;
   return pairmap_training;
 }
 
@@ -143,9 +157,10 @@ auto read_refals(char* file){
   std::ifstream infile(file);
   string line;
 
+  //int ii=0;
   while(getline(infile,line)){
         std::stringstream ss(line);
-       string read, chr, mate;
+	string read, chr, mate;
         int flag;
         long int pos, mate_pos;
         int same_scaff=0;
@@ -159,9 +174,14 @@ auto read_refals(char* file){
         if ( mate == "=" ){
           mate = chr;
           same_scaff=1;
+	  
+	  //if (ii<10) cout << read << endl;
+	  //ii++;
         }
 	samechr_map[read] = same_scaff;
   }
+
+  //cout << ii << endl;
   return samechr_map;
 }
 
@@ -199,7 +219,6 @@ int write_data( auto pairmap, auto lenmap, string filename)
       
       vector<long int> pos1 =  std::get<0>(pairmap[scaffold][mate]);
       vector<long int> pos2 =  std::get<1>(pairmap[scaffold][mate]);
-      //vector<int> samechr =  std::get<2>(pairmap[scaffold][mate]);
       
       int  nlinks= pos1.size();     
            
@@ -347,64 +366,4 @@ int write_data_training( auto pairmap, auto lenmap, string filename)
     }
   }
   myals.close();
-
 }
-
-
-
-/*
-int read_hicmap(string file){  
-  std::ifstream infile(file.c_str());
-  string line;
-
-  while(getline(infile,line)){
-    std::stringstream ss(line);
-    string read, scaffold, cigar, mate;
-    int flag, mapq;
-    long int pos, mate_pos, insert;
-    int same_scaff;
-    ss >> read >> scaffold >> pos >>
-      mate >> mate_pos >> insert >> same_scaff ;
-
-    //if ( scaffold == mate )  same_scaff = 1;
-    samechr_map[read] = same_scaff;
-  }
- 
-  return 0;
-}
-*/
-
-/*
-int read_refals(char* file){
-  std::ifstream infile(file);
-  string line;
-
-  while(getline(infile,line)){
-        std::stringstream ss(line);
-        string read, scaffold, cigar, mate;
-	int flag, mapq;
-	long int pos, mate_pos, insert;
-	int same_scaff=0;
-
-        ss >> read >> flag >> scaffold >> pos 
-	   >> mapq >> cigar >> mate >> mate_pos >> insert;
-
-	if( samechr_map.count(read) ) continue;
-	
-	if ( mate == "=" ){
-	  mate = scaffold;
-	  same_scaff=1;
-	}
-	
-	// filter on flag and mapq?
-	//std::tuple<string,long int, string, long int, long int, long int, long int > 
-	// thistuple=std::make_tuple(scaffold, pos, mate, mate_pos, insert, lenmap[scaffold], lenmap[mate]);
-	
-	samechr_map[read] = same_scaff;
-	  
-	myals << read << " " << scaffold << " " <<  pos << " " 
-	      << mate<< " " << mate_pos<< " " << insert << " " << same_scaff << endl; 
-	
-  }
-}
-*/

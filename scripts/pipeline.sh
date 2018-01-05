@@ -1,4 +1,5 @@
 #!/bin/bash
+export PYTHONPATH=$myscripts/:$PYTHONPATH
 
 
 if [ $# -lt 2 ] || [ $1 == '-h' ]; then
@@ -13,6 +14,7 @@ fi
 project=$1
 step=$2
 model=$3
+optimize=$4
 
 source $project/project.sh
 mkdir -p $wdir
@@ -39,7 +41,7 @@ if [ ! $err -eq 0 ]; then echo; echo " ****  Error! Something is wrong! Giving u
 ######### 1. Prepare alignment file for scaffold #########
 already_there="(Already there)"
 if [[ ! -s $alfile ]]; then
-    samtools view -f 0x40 -F 4 -F 0x900 $samfile | awk '{print $1, $2, $3, $4, $7, $8}' > $alfile
+    samtools view -f 0x40 -F 4 -F 0x900 $samfile | grep -v "=" | awk '{print $1, $2, $3, $4, $7, $8}' > $alfile
     already_there="New"
 fi
 if [[ ! -s $alfile ]]; then  echo; echo "Could not create the alignment file!";  echo "error"; err=$(($err+1)); fi    
@@ -67,7 +69,7 @@ if [ $step == "train" ]; then
     ######### 1. Prepare alignment file for chr #########
     already_there="(Already there)"
     if [[ ! -s $refals ]]; then
-	samtools view -f 0x40 -F 4 -F 0x900 $samref | awk '{print $1, $2, $3, $4, $7, $8}' > $refals
+	samtools view -f 0x40 -F 4 -F 0x900 $samref | grep "=" | awk '{print $1, $2, $3, $4, $7, $8}' > $refals
 	already_there="New"
     fi
     if [[ ! -s $refals ]]; then  echo; echo "Could not create the alignment file!"; err=$(($err+1)); fi    
@@ -82,7 +84,6 @@ if [ $step == "train" ]; then
     if [ ! -f $hictochr ]; then 
 	already_there="New"
 	$mysrcs/map_reads_fortraining/map_reads_fortraining $wdir/scaffolds_lenghts.txt  $alfile  $refals
-	echo
     fi    
     if [ ! -f $hictochr ]; then 
 	echo "  Error: Something went wrong during map_reads_fortraining"
@@ -90,7 +91,7 @@ if [ $step == "train" ]; then
     fi
     echo "Train 2. HiC reads scaffold map plus same_chr printed"  $already_there
 
-    #python $myscripts/train_or_predict.py -r $hictochr -f randfor  
+    python $myscripts/train_or_predict.py -r $hictochr -f $model -o $optimize
 
     # train_or_predict.py  need to modify
     ### Add python script to train and printout model
@@ -114,9 +115,8 @@ if [ $step == "predict" ]; then
     fi
     echo; echo "Predict 1. HiC reads scaffold map printed "
 
-    ln -sf $model $wdir/mymodel.sav    
-    export PYTHONPATH=$myscripts/:$PYTHONPATH
-    python $myscripts/train_or_predict.py -r $hictoscaff -m $wdir/mymodel.sav   #-f randfor  #own?
+    #ln -sf $model $wdir/mymodel.sav    
+    python $myscripts/train_or_predict.py -r $hictoscaff -f $model -o $optimize
     
     # train_or_predict.py  need to modify
     ### Add python script to read model and print out list of read pair with predicted real connection

@@ -81,7 +81,7 @@ if [ $step == "train" ]; then
     already_there="(Already there)"
     if [ ! -f $hictochr ]; then 
 	already_there="New"
-	$mysrcs/map_reads_fortraining/map_reads_fortraining $wdir/scaffolds_lenghts.txt $alfile  $refals
+	$mysrcs/map_reads_fortraining/map_reads_fortraining $wdir/scaffolds_lenghts.txt  $alfile  $refals
 	echo
     fi    
     if [ ! -f $hictochr ]; then 
@@ -90,9 +90,9 @@ if [ $step == "train" ]; then
     fi
     echo "Train 2. HiC reads scaffold map plus same_chr printed"  $already_there
 
+    #python $myscripts/train_or_predict.py -r $hictochr -f randfor  
 
-    
-
+    # train_or_predict.py  need to modify
     ### Add python script to train and printout model
 fi
 
@@ -115,8 +115,13 @@ if [ $step == "predict" ]; then
     echo; echo "Predict 1. HiC reads scaffold map printed "
 
     ln -sf $model $wdir/mymodel.sav    
+    export PYTHONPATH=$myscripts/:$PYTHONPATH
+    python $myscripts/train_or_predict.py -r $hictoscaff -m $wdir/mymodel.sav   #-f randfor  #own?
+    
+    # train_or_predict.py  need to modify
     ### Add python script to read model and print out list of read pair with predicted real connection
     ### Filter original sam file with predicted real connection only, and run Arima again
+    echo "Predict 2. Prediction done"
 
 fi 
 

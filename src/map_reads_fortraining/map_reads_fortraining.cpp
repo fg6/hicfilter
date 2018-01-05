@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 {   
   gzFile fp;
   if (argc < 3 ) {
-    fprintf(stderr, "Usage: %s  <scaffolds_lengths> <alignments>  \n", argv[0]);   
+    fprintf(stderr, "Usage: %s  <scaffolds_lengths> <alignments> <ref_alignments>  \n", argv[0]);   
     return 1;
   }	
   for (int i=0; i<argc; i++){
@@ -37,16 +37,9 @@ int main(int argc, char *argv[])
     }
     gzclose(fp);
   }
-
-  std::map<string, long int> lenmap;
- 
-  // for training case only
-  //std::map<string, long int> refmap;
-  //std::map< std::string, 
-  //	  std::map< std::string, std::tuple<vector<long int>,vector<long int>,vector<int> > > > pairmap_training;
-
-  
+   
   //Read Scaffold lengths
+  std::map<string, long int> lenmap;
   fp = gzopen(argv[1],"r");
   lenmap=readscaff(argv[1]);
 
@@ -55,7 +48,7 @@ int main(int argc, char *argv[])
 
   // Map HiC reads to Ref and get samechr_map
   std::map<string, int>  samechr_map;  
-  samechr_map = read_refals(argv[2]);  
+  samechr_map = read_refals(argv[3]);  
     
 
   // Read and create Map for pair of alignments
@@ -65,7 +58,7 @@ int main(int argc, char *argv[])
  
  
   // Write map and alignment positions plus same chr yes or no column
-  string myname = "hic_to_scaff.als";   //includes col for yes/no same chr  "map_n_reads_training.txt";
+  string myname = "hic_to_scaff_fortraining.als";   //includes col for yes/no same chr  "map_n_reads_training.txt";
   write_data_training(pairmap_training,lenmap,myname);
 
   return 0;

@@ -40,7 +40,7 @@ if [ $step == "setup" ]; then
       echo
       exit
   fi
-  $myscripts/setup.sh $mymain $2 $3 $4
+  $myscripts/setup.sh $mymain $2 $3 $4 $5 $6
 
 fi
 

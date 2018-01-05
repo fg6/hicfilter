@@ -7,6 +7,7 @@ mysam=$3
 project=$4
 myrefsam=$5
 
+
 if [ $# -lt 4 ]; then
     echo; echo " Something wrong in your setup.sh script!"
     exit
@@ -28,7 +29,7 @@ sed $sub1 $myscripts/settings.sh | sed $sub2 | sed $sub3 | sed $sub4 > $project/
 
 if [ $# -eq 5 ]; then
     sub5="s#MYREFSAM#$myrefsam#g"
-    sed -i $sub4  $project/project.sh
+    sed -i $sub5  $project/project.sh
 fi
 
 cp $myscripts/launch.sh $project/launch.sh

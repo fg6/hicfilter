@@ -46,14 +46,15 @@ def main():
     inputfile = args.filename
     model =  args.loadmodel
     fitmodel = args.fitmodel
-    optimize = args.optimize
+    optimize = int(args.optimize)
+
 
     train = 0
     if not args.loadmodel:
         train = 1
         
 
-   # minimum scaffold size
+    # minimum scaffold size
     min_size = 1000000  
 
     # Read alignments
@@ -84,24 +85,25 @@ def main():
  
              if optimize == 1:
                  n_est, maxf, crit, min_s_leaf = utils.best_randforest_cl(x, y)
+                 print(" Best xgboost")
                  #{'criterion': 'entropy', 'max_features': 'log2', 
                  #     'min_samples_leaf': 10, 'n_estimators': 700}
-             
-             clf_rf = utils.randforest_cl(X_train, y_train, n_est, maxf, crit, min_s_leaf)
+               
 
+             clf_rf = utils.randforest_cl(X_train, y_train, n_est, maxf, crit, min_s_leaf)
              o_model_rf = 'randfor.sav'
              joblib.dump(clf_rf,o_model_rf)  
              
          if fitmodel == "xgboost" or fitmodel == "both":
              booster='gbtree'
              eta=0.1
-             max_depth=6
-             subsample=1
-             print(optimize)
-            
-             #if optimize == 1:
-                 #booster, eta, 
-             max_depth, subsample  = utils.best_xgboost_cl(x, y)
+             max_depth=30
+             subsample=0.5
+
+             if optimize == 1:
+                 print(" Best xgboost")
+                 #max_depth, subsample  = utils.best_xgboost_cl(x, y)
+                 # {'max_depth': 30, 'subsample': 0.5} #booster, eta, not in version?
 
              clf_xgb = utils.xgboost_cl(X_train, y_train, booster, eta, max_depth, subsample)
              o_model_xgb = 'xgboost.sav'
@@ -125,6 +127,7 @@ def main():
              import numpy as np
              #y_pred = y_pred_rf * y_pred_xgb
              y_pred = np.array(y_pred_rf) | np.array(y_pred_xgb) 
+             print("Xgboost|RandForest Accuracy")
              #[x or y for (x, y) in zip(a, b)]   wo numpy
 
          ### Estimate Accuracy and Confusion Matrix on Training sample ###
@@ -135,8 +138,9 @@ def main():
          ######################################
          ### Test Predict with chosen Model ###
 
-         print("\n Test sample: ")
 
+         print("\n Test sample: ")
+         #print("  Tot Real Pos:", sum(y_test))
          if fitmodel == "randfor":
              y_pred = clf_rf.predict(X_test) 
          elif fitmodel == "xgboost":
@@ -144,15 +148,21 @@ def main():
          elif fitmodel == "both":
              y_pred_rf = clf_rf.predict(X_test) 
              print("Random Forest Accuracy")
+             #print("  Predicted pos: ", y_pred_rf.sum(), " Predicted Neg: ", len(y_pred_rf)-y_pred_rf.sum() )
              utils.get_accuracy_cl(y_pred_rf, y_test)
              y_pred_xgb = clf_xgb.predict(X_test) 
              print("Xgboost Accuracy")
+             #print("  Predicted pos: ", y_pred_xgb.sum(), " Predicted Neg: ", len(y_pred_xgb)-y_pred_xgb.sum() )
              utils.get_accuracy_cl(y_pred_xgb, y_test)
+
+             # Combine models?
              #y_pred = y_pred_rf * y_pred_xgb
              y_pred = np.array(y_pred_rf) | np.array(y_pred_xgb) 
+             print("Xgboost|RandForest Accuracy")
 
 
          ### Estimate Accuracy and Confusion Matrix on Test sample ###
+         #print("  Predicted pos: ", y_pred.sum(), " Tot Neg: ", len(y_pred)-y_pred.sum() )
          utils.get_accuracy_cl(y_pred, y_test)
 
 

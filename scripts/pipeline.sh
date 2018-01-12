@@ -10,16 +10,17 @@ fi
 # cases:
 # train : needs scaffold.als, chr.als, map_training, python_train
 # predict : needs model_from_python, scaffold.als, map, python_predict
- 
+# loop train : test accuracy on various scaffold lengths 
+
 project=$1
 step=$2
 model=$3
 optimize=$4
 
+
 source $project/project.sh
 mkdir -p $wdir
 cd $wdir
-
 ###### Check input files ######
 
 err=0
@@ -28,14 +29,23 @@ if [ ! -f $mydraft ]; then echo; echo "Could not find draft assembly in" $mydraf
 if [[ ! -f $samref ]] && [[ $step == 'train' ]]; then 
     echo; echo "Could not find ref samfile in" $samref; err=$(($err+1)); 
 elif [[ $step == 'predict' ]]; then
-    echo $model
-    if [[ $model == '' ]] || [[ ! -s $model ]]; then
-	 echo; echo "Could not find model for prediction in" $model; err=$(($err+1));
+    if [[ $model == '' ]]; then
+    	echo; echo " Please specify which model to load: randfor, xgboost, both  or /full/path/to/model.sav"; 
+    	err=$(($err+1)); 
+    fi
+
+    if [[ ! -s $model ]]; then   # it's not a file or does not exists	
+	if [[ ! -s $wdir/$model.sav ]]; then    # it's either both or  does not exists
+	    if [[ ! $model = "both" ]]; then
+		echo; echo "Could not find model for prediction in" $model;
+		echo; echo " Please specify which model to load: randfor, xgboost, both  or /full/path/to/model.sav"; 
+		err=$(($err+1))
+	    fi
+	fi
+   
     fi
 fi
 if [ ! $err -eq 0 ]; then echo; echo " ****  Error! Something is wrong! Giving up! **** "; echo; exit; fi
-
-
 
 ### common_steps.sh
 ######### 1. Prepare alignment file for scaffold #########
@@ -62,7 +72,7 @@ fi
 echo "2. Draft Stats checked and scaffold_lengths printed" $already_there
 
 
-if [ $step == "train" ]; then
+if [ $step == "train" ] || [ $step == "looptrain" ]; then
 
     ### move to train.sh
 
@@ -91,7 +101,7 @@ if [ $step == "train" ]; then
     fi
     echo "Train 2. HiC reads scaffold map plus same_chr printed"  $already_there
 
-    python $myscripts/train_or_predict.py -r $hictochr -f $model -o $optimize
+    python $myscripts/train_or_predict.py -r $hictochr -f $model -o $optimize -m $step
 
     # train_or_predict.py  need to modify
     ### Add python script to train and printout model
@@ -115,9 +125,9 @@ if [ $step == "predict" ]; then
     fi
     echo; echo "Predict 1. HiC reads scaffold map printed "
 
-    #ln -sf $model $wdir/mymodel.sav    
-    python $myscripts/train_or_predict.py -r $hictoscaff -f $model -o $optimize
+    python $myscripts/train_or_predict.py -r $hictoscaff -f $model -o $optimize -m predict
     
+
     # train_or_predict.py  need to modify
     ### Add python script to read model and print out list of read pair with predicted real connection
     ### Filter original sam file with predicted real connection only, and run Arima again

@@ -39,7 +39,7 @@ def read_data(file, min_size, train):
 
     if train:
         y = list(data[:, t])
-        return x, y
+        return x, y #, tdf
     else:
         # save pairs of scaffolds:
         pairs = data[:, t+1:t+3] 
@@ -47,7 +47,32 @@ def read_data(file, min_size, train):
 
         return x, pairs
   
+def read_df(file, min_size, train):
+    import pandas as pd
 
+    # columns:
+    if train:
+        t=0         # target column is first
+    else:         
+        t=-1        # no target column
+
+    nlinks = t + 5
+    scaf1_len = t + 3
+    scaf2_len = scaf1_len + 1
+    hits = nlinks + 1
+
+    # read file
+    tdf = pd.read_csv(file, sep=" ", header=None)
+      
+    # keep only scaffold >= min_size
+    tdf = tdf[ (tdf[scaf1_len] > min_size) & (tdf[scaf2_len] > min_size) ]
+
+    # normalize hits by total number of links in this scaffold pair
+    tdf.loc[:, hits:]  = tdf.loc[:, hits:].divide(tdf.values[:,nlinks], axis='index')  
+    
+    return tdf
+
+  
 def resize(X, target, test_perc):
     from sklearn.model_selection import train_test_split
     
@@ -149,11 +174,5 @@ def get_accuracy_cl(y_pred, y):
     false_pos = conmat[0][1]
     false_neg = conmat[1][0]
 
-    ### Print Score and Confusion Matrix ### 
-    print("  Score :", (tf(score)), " f1 score :", tf(f1score),
-          "\n  Pos_ok:", pos_ok, 
-          "False Neg:", false_neg, 
-          " Pos error:", of(false_neg*100/(false_neg + pos_ok)),
-          "%\n  Neg_ok:", neg_ok, "False_pos:", false_pos,           
-          " Neg error:", of(false_pos*100/(false_pos + neg_ok)),"%")
-    
+ 
+    return(score, pos_ok,false_neg, false_neg*100/(false_neg + pos_ok), neg_ok,  false_pos, false_pos*100/(false_pos + neg_ok))

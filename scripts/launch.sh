@@ -16,7 +16,8 @@ elif [  $# -lt 2 ] && [ $1 == 'predict' ]; then
     echo "     step: pipeline step to be run. Options: train or predict " 
     echo "      * train: train model on alignment to scaffolds and info on same_chr"
     echo "      * predict: use saved model to predict which connections are true"
-    echo "      * full/path/to/model.sav: for the predict step provide location of model to be used for predicition"
+    echo "      * full/path/to/model.sav: for the predict step provide location of model to be used for predicition, or"
+    echo "                                randfor or xgboost or both for model saved in the same project "
     exit
 fi
 

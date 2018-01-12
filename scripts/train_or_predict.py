@@ -308,7 +308,6 @@ def main():
              y_pred = np.array(y_pred_rf) | np.array(y_pred_xgb) 
              print("Xgboost|RandForest Accuracy")
 
-
          ### Estimate Accuracy and Confusion Matrix on Test sample ###
          #print("  Predicted pos: ", y_pred.sum(), " Tot Neg: ", len(y_pred)-y_pred.sum() )
          score, pos_ok, false_neg, err_pos, neg_ok,  false_pos, err_neg = utils.get_accuracy_cl(y_pred, y_test)

@@ -101,7 +101,7 @@ if [ $step == "train" ] || [ $step == "looptrain" ]; then
     fi
     echo "Train 2. HiC reads scaffold map plus same_chr printed"  $already_there
 
-    python $myscripts/train_or_predict.py -r $hictochr -f $model -o $optimize -m $step
+    #python $myscripts/train_or_predict.py -r $hictochr -f $model -o $optimize -m $step
 
     # train_or_predict.py  need to modify
     ### Add python script to train and printout model

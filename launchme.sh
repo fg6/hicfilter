@@ -31,12 +31,13 @@ if [ $step == "setup" ]; then
   ###################################################
   # echo; echo " Setup for your project in progress..."
   ###################################################
-  if [ $# -lt 3 ]  || [ $2 == '-h' ]; then
-      echo; echo "  Usage:" $(basename $0) setup  \</full/path/to/draft\>  \</full/path/to/file.sam\>  \</full/path/to/destdir\>
+  if [ $# -lt 5 ]  || [ $2 == '-h' ]; then
+      echo; echo "  Usage:" $(basename $0) setup  \</full/path/to/draft\>  \</full/path/to/file.sam\>  \</full/path/to/destdir\>  \</full/path/to/reffile.sam\>
       echo
       echo "   /full/path/to/draft: location of draft assembly (fasta) "
       echo "   /full/path/to/file.sam: location of sam file for HiC reads mapped against the draft assembly " 
       echo "   /full/path/to/destdir: location of your project "
+      echo "   /full/path/toref/file.sam: location of sam file for HiC reads mapped against the reference assembly: For training Only " 
       echo
       exit
   fi

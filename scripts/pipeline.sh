@@ -63,13 +63,14 @@ echo; echo "1. Scaffold alignment file is ready!" $already_there
 ######### 2. Prepare scaffold stats and lengths ########
 already_there="(Already there)"
 if [[ ! -s $wdir/myn50.dat ]] || [[ ! -s $wdir/scaffolds_lenghts.txt ]]; then 
-    $mysrcs/n50/n50 $mydraft '>' $wdir/myn50.dat
+    $mysrcs/n50/n50 $mydraft > $wdir/myn50.dat
     already_there="New"
 fi
 if [[ ! -s $wdir/myn50.dat ]] || [[ ! -s $wdir/scaffolds_lenghts.txt ]]; then 
     echo; echo "Could not analyze draft assembly";  echo "error"; err=$(($err+1)); 
 fi
 echo "2. Draft Stats checked and scaffold_lengths printed" $already_there
+if [ ! $err -eq 0 ]; then echo; echo " ****  Error! Something is wrong! Giving up! **** "; echo; exit; fi
 
 
 if [ $step == "train" ] || [ $step == "looptrain" ]; then
@@ -79,7 +80,8 @@ if [ $step == "train" ] || [ $step == "looptrain" ]; then
     ######### 1. Prepare alignment file for chr #########
     already_there="(Already there)"
     if [[ ! -s $refals ]]; then
-	samtools view -f 0x40 -F 4 -F 0x900 $samref | grep "=" | awk '{print $1, $2, $3, $4, $7, $8}' > $refals
+	#samtools view -f 0x40 -F 4 -F 0x900 $samref | grep "=" | awk '{print $1, $2, $3, $4, $7, $8}' > $refals  Error! we need also the not =?
+	samtools view -f 0x40 -F 4 -F 0x900 $samref | awk '{print $1, $2, $3, $4, $7, $8}' > $refals
 	already_there="New"
     fi
     if [[ ! -s $refals ]]; then  echo; echo "Could not create the alignment file!"; err=$(($err+1)); fi    
@@ -103,8 +105,6 @@ if [ $step == "train" ] || [ $step == "looptrain" ]; then
 
     #python $myscripts/train_or_predict.py -r $hictochr -f $model -o $optimize -m $step
 
-    # train_or_predict.py  need to modify
-    ### Add python script to train and printout model
 fi
 
 

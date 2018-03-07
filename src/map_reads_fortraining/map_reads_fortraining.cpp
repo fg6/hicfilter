@@ -43,19 +43,18 @@ int main(int argc, char *argv[])
   fp = gzopen(argv[1],"r");
   lenmap=readscaff(argv[1]);
 
-  //Need to rewrite following and read_refals function to read and same map of read-links same chr yes or no:
-  // fill  samechr_map!!
-
+ 
   // Map HiC reads to Ref and get samechr_map
   std::map<string, int>  samechr_map;  
   samechr_map = read_refals(argv[3]);  
-    
+  cout << " Train 1a: samechr_map ready" << endl;   
 
   // Read and create Map for pair of alignments
   std::map< std::string, 
     std::map< std::string, std::tuple<vector<long int>,vector<long int>,vector<int> > > > pairmap_training;
   pairmap_training = read_als_training(argv[2] , samechr_map);
- 
+  cout << " Train 1b: pairmap_training ready" << endl;   
+
  
   // Write map and alignment positions plus same chr yes or no column
   string myname = "hic_to_scaff_fortraining.als";   //includes col for yes/no same chr  "map_n_reads_training.txt";

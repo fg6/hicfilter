@@ -42,7 +42,6 @@ auto read_als(char* file){
         ss >> read >> flag >> scaffold >> pos
 	   >>  mate >> mate_pos;
 
-	
         if ( mate == "=" ) continue;  // pair on same scaffold: not interesting
 	
 	if(pairmap[scaffold].count(mate) && pairmap[mate].count(scaffold) ){
@@ -58,7 +57,7 @@ auto read_als(char* file){
           pos2.push_back(mate_pos);
           pairmap[scaffold][mate] = std::make_tuple(pos1,pos2);	  
 
-	} else if(pairmap[mate].count(scaffold) ){ // otherwise, pair [mate][scaffold]  exists already, add one
+	} else if ( pairmap[mate].count(scaffold) ){ // otherwise, pair [mate][scaffold]  exists already, add one
 	  vector<long int> pos1 =  std::get<0>(pairmap[mate][scaffold]); // mate_pos
           vector<long int> pos2 =  std::get<1>(pairmap[mate][scaffold]); // pos
 
@@ -86,9 +85,9 @@ auto  read_als_training(char* file, std::map<string, int> samechr_map ){
   string line;
 
   int err=0;
-  //int ii=0;
-  //int elim=0;
-  //int fine=0;
+  int ii=0;
+  int elim=0;
+  int fine=0;
   while(getline(infile,line)){
         std::stringstream ss(line);
         string read, scaffold, mate;
@@ -99,17 +98,12 @@ auto  read_als_training(char* file, std::map<string, int> samechr_map ){
         ss >> read >> flag >> scaffold >> pos
 	   >>  mate >> mate_pos;
 
+	ii++;
 	
-	/*if(samechr_map[read]){
-	  ii++;
-	  //if(ii<10) cout << " total: " << ii << endl;
+	if ( mate == "=" ) continue;  // pair on same scaffold: not interesting
+	
 
-	  //if(mate == "=") elim++;
-	  //else fine++;
-	  }*/
-	    
-        if ( mate == "=" ) continue;  // pair on same scaffold: not interesting
-	
+	fine++;
 	// check for bug: //
 	if(pairmap_training[scaffold].count(mate) && pairmap_training[mate].count(scaffold) ){
 	  if(!err)cout << " Error: duplicate in map " << scaffold << " " << mate << endl; // rpint only once
@@ -146,7 +140,7 @@ auto  read_als_training(char* file, std::map<string, int> samechr_map ){
   }
 
 
-  //cout << " Total: " << ii << " eliminated: " << elim << " fine: "<< fine << endl;
+  cout << " Total: " << ii <<  " fine: "<< fine << endl;
   return pairmap_training;
 }
 
@@ -157,7 +151,8 @@ auto read_refals(char* file){
   std::ifstream infile(file);
   string line;
 
-  //int ii=0;
+  int ii=0;
+  int fine=0;
   while(getline(infile,line)){
         std::stringstream ss(line);
 	string read, chr, mate;
@@ -168,7 +163,7 @@ auto read_refals(char* file){
         ss >> read >> flag >> chr >> pos
 	   >>  mate >> mate_pos;
      
-
+	ii++;
         if( samechr_map.count(read) ) continue;
         
         if ( mate == "=" ){
@@ -176,12 +171,12 @@ auto read_refals(char* file){
           same_scaff=1;
 	  
 	  //if (ii<10) cout << read << endl;
-	  //ii++;
+	  fine++;
         }
 	samechr_map[read] = same_scaff;
   }
 
-  //cout << ii << endl;
+  cout << " Total: " << ii <<  " fine: "<< fine << endl;
   return samechr_map;
 }
 
